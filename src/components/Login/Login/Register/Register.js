@@ -1,7 +1,6 @@
-
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../../../../Context/Authprovider";
-import { useHistory, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Box,
   Card,
@@ -13,15 +12,23 @@ import {
 
 const Register = () => {
   const { register } = useContext(AuthContext);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const history = useHistory();
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate(); // ✔ Correct for React Router v6
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (register(name, email, password)) {
-      history.push("/login");
+
+    // ✔ Await register() because most auth functions are async
+    const success = await register(name, email, password);
+
+    if (success) {
+      navigate("/login"); // ✔ Correct routing
+    } else {
+      alert("Registration failed! 😔");
     }
   };
 
