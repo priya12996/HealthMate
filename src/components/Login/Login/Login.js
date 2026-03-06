@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../../../Context/Authprovider";
-import { useHistory, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Box,
   Card,
@@ -14,12 +14,13 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const history = useHistory();
+  const navigate = useNavigate(); // ✅ inside component
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Assume login returns true on success
     if (login(email, password)) {
-      history.push("/appointment");
+      navigate("/appointment"); // ✅ v6 replacement for history.push
     }
   };
 
@@ -65,6 +66,8 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+{/* npm init -y
+npm install express axios cors */}
 
             <Button
               type="submit"

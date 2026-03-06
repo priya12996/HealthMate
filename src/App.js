@@ -1,45 +1,40 @@
-import { Switch } from "react-router-dom";
-import { Route } from "react-router-dom";
-import { BrowserRouter } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
-import About from "./components/About/About";
+import Hospitals from "./components/Hospitals/Hospitals";
+
 import Header from "./components/Header/Header/Header";
-import Home from "./components/Home/Home";
-import { ThemeProvider } from "@mui/material";
-import { createTheme } from "@mui/material/styles";
-import Notfound from "./components/Notfound/Notfound";
 import Footer from "./components/Header/Footer/Footer";
-import DietPlan from "./components/DietPlan";
-import Login from "./components/Login/Login/Login";
-import Register from "./components/Login/Login/Register/Register";
-import Authprovider from "./Context/Authprovider";
+import Home from "./components/Home/Home";
+import About from "./components/About/About";
 import Services from "./components/Services/Services";
 import Doctors from "./components/Services/Doctors/Doctors";
 import Appointment from "./components/Services/Appointment/Appointment";
 import ServiceDetails from "./components/Services/ServiceDetails/ServiceDetails";
+import Login from "./components/Login/Login/Login";
+import Register from "./components/Login/Login/Register/Register";
+import Notfound from "./components/Notfound/Notfound";
 import PrivetRoute from "./PrivetRoute/PrivetRoute";
+import DietPlan from "./components/DietPlan";
+import DietSuggestion from "./components/DietSuggestion";
 import SymptomChecker from "./components/SymptomChecker";
 import WaterTracker from "./components/WaterTracker/WaterTracker";
 import Chatbot from "./components/Chatbot/Chatbot";
 import HealthChallenge from "./components/Gamification/HealthChallenge";
 import BMICalculator from "./components/BMI/BMICalculator";
-import React from "react";
-import DietSuggestion from "./components/DietSuggestion";
-import Quiz from "./components/Quiz/Quiz"; 
+import Quiz from "./components/Quiz/Quiz";
+
+import Authprovider from "./Context/Authprovider";
+
+import { ThemeProvider } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
+
 export const myTheme = createTheme({
   palette: {
-    primary: {
-      main: "#e91e63",
-    },
-    secondary: {
-      main: "#f48fb1",
-    },
-    alternate: {
-      main: "#fff",
-    },
-    text: {
-      secondary: "#212121",
-    },
+    primary: { main: "#e91e63" },
+    secondary: { main: "#f48fb1" },
+    alternate: { main: "#fff" },
+    text: { secondary: "#212121" },
   },
   typography: {
     fontFamily: "Quicksand",
@@ -57,77 +52,91 @@ function App() {
         <BrowserRouter>
           <Header />
 
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route path="/home">
-              <Home />
-            </Route>
-            <PrivetRoute path="/doctors">
-              <Doctors />
-            </PrivetRoute>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <Route path="/register">
-              <Register />
-            </Route>
-            <Route path="/about">
-              <About />
-            </Route>
-            <Route path="/profile">
-              <Login />
-            </Route>
-            <PrivetRoute path="/appointment">
-              <Appointment />
-            </PrivetRoute>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
 
-            
-            <Route exact path="/services">
-              <Services />
+            <Route
+              path="/doctors"
+              element={
+                <PrivetRoute>
+                  <Doctors />
+                </PrivetRoute>
+              }
+            />
 
-              
-              <div className="feature-wrapper"></div>
-              <div className="feature-container">
-                <div className="feature-box">
-                  <h2> Symptom Checker</h2>
-                  <SymptomChecker />
-                </div>
-                <div className="feature-box">
-                  <h2> Diet & Nutrition Suggestion</h2>
-                  <DietSuggestion />
-                  <DietPlan/>
-                </div>
-              </div>
-            </Route>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/profile" element={<Login />} />
 
-            <PrivetRoute exact path="/services/details/:servId">
-              <ServiceDetails />
-            </PrivetRoute>
-            <Route path="*">
-              <Notfound />
-            </Route>
-          </Switch>
+            <Route
+              path="/appointment"
+              element={
+                <PrivetRoute>
+                  <Appointment />
+                </PrivetRoute>
+              }
+            />
 
+            {/* Services Page */}
+            <Route
+              path="/services"
+              element={
+                <>
+                  <Services />
+
+                  <div className="feature-wrapper"></div>
+                  <div className="feature-container">
+                    <div className="feature-box">
+                      <h2>Symptom Checker</h2>
+                      <SymptomChecker />
+                    </div>
+
+                    <div className="feature-box">
+                      <h2>Diet & Nutrition Suggestion</h2>
+                      <DietSuggestion />
+                      <DietPlan />
+                    </div>
+                  </div>
+                </>
+              }
+            />
+<Route path="/hospitals" element={<Hospitals />} />
+
+            <Route
+              path="/services/details/:servId"
+              element={
+                <PrivetRoute>
+                  <ServiceDetails />
+                </PrivetRoute>
+              }
+            />
+
+            <Route path="*" element={<Notfound />} />
+          </Routes>
+
+          {/* Bottom Feature Section (unchanged) */}
           <div className="feature-container">
             <div className="feature-box">
-              <h2> BMI Calculator</h2>
+              <h2>BMI Calculator</h2>
               <BMICalculator />
             </div>
+
             <div className="feature-box">
               <h2>💬 Health Chatbot</h2>
               <Chatbot />
             </div>
+
             <div className="feature-box">
               <h2>🎮 Health Quiz</h2>
               <Quiz />
             </div>
-            <div className="feature-box">
-  <h2>Water Intake Tracker</h2>
-  <WaterTracker />
-</div>
 
+            <div className="feature-box">
+              <h2>Water Intake Tracker</h2>
+              <WaterTracker />
+            </div>
           </div>
 
           <HealthChallenge />

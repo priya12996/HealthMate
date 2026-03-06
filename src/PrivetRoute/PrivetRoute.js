@@ -1,29 +1,22 @@
-
 import React, { useContext } from "react";
-import { Route, Redirect } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../Context/Authprovider";
 
-const PrivetRoute = ({ children, ...rest }) => {
+const PrivetRoute = ({ children }) => {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
 
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        user ? (
-          children
-        ) : (
-          <Redirect
-            to={{ pathname: "/login", state: { from: location } }}
-          />
-        )
-      }
-    />
-  );
+  if (!user) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location }}
+      />
+    );
+  }
+
+  return children;
 };
 
 export default PrivetRoute;
-
-/* if (!isLoading) {
-    return (<LoadingScreen></LoadingScreen>);
-} */
