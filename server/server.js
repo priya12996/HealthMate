@@ -494,11 +494,10 @@ app.get("/", (req, res) => {
 app.get("/api/hospitals", async (req, res) => {
   try {
     const { lat, lng, radius } = req.query;
+    console.log('Hospitals request received - lat:', lat, 'lng:', lng, 'radius:', radius);
 
     if (!lat || !lng) {
-      return res.status(400).json({
-        error: "Latitude and Longitude required",
-      });
+      return res.status(400).json({ error: "Latitude and Longitude required" });
     }
 
     const searchRadius = radius || 10000;
@@ -513,25 +512,24 @@ app.get("/api/hospitals", async (req, res) => {
       out body;
     `;
 
-    const response = await axios.post(
-      "https://overpass.kumi.systems/api/interpreter",
-      query,
-      {
-        headers: { "Content-Type": "text/plain" },
-        timeout: 15000,
-      }
-    );
+    // Call Overpass API with its own try/catch to prevent whole endpoint failure
+    let elements = [];
+    try {
+      const response = await axios.post(
+        "https://overpass.kumi.systems/api/interpreter",
+        query,
+        { headers: { "Content-Type": "text/plain" }, timeout: 15000 }
+      );
+      elements = response.data.elements || [];
+    } catch (apiErr) {
+      console.error('Overpass API error:', apiErr.message, apiErr.response?.data);
+      // fall back to empty list so frontend can still render
+    }
 
-    // ✅ IMPORTANT: send RAW data (frontend compatible)
-    res.json({
-      elements: response.data.elements || [],
-    });
-
+    res.json({ elements });
   } catch (error) {
-    console.error("Hospital API Error:", error.message);
-    res.status(500).json({
-      error: "Server error",
-    });
+    console.error('Hospital endpoint error:', error);
+    res.status(500).json({ error: error.message || "Server error" });
   }
 });
 
