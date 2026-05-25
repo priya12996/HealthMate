@@ -26,6 +26,7 @@ const [darkMode, setDarkMode] = useState(false);
     { name: "Doctors", path: "/doctors" },
     { name: "Services", path: "/services" },
     { name: "About", path: "/about" },
+      { name: "Hospitals", path: "/hospitals" },
     { name: "Appointment", path: "/appointment" },
   ];
 

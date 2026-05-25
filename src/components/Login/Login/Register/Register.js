@@ -1,9 +1,6 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../../../../Context/Authprovider";
 import { useNavigate, Link } from "react-router-dom";
-//import { useHistory } from "react-router-dom";
-//import { useNavigate } from "react-router-dom";
-
 
 import {
   Box,
@@ -12,6 +9,7 @@ import {
   TextField,
   Button,
   Typography,
+  Alert,
 } from "@mui/material";
 
 const Register = () => {
@@ -20,19 +18,38 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const navigate = useNavigate(); // ✔ Correct for React Router v6
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    // ✔ Await register() because most auth functions are async
+    // 🔒 Validation
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters 😤");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match 😤");
+      return;
+    }
+
+    setLoading(true);
+
     const success = await register(name, email, password);
 
+    setLoading(false);
+
     if (success) {
-      navigate("/login"); // ✔ Correct routing
+      navigate("/login");
     } else {
-      alert("Registration failed! 😔");
+      setError("Registration failed! Try again 😔");
     }
   };
 
@@ -57,34 +74,51 @@ const Register = () => {
             Create Account
           </Typography>
 
+          {/* ❌ Error Message */}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit}>
             <TextField
               fullWidth
               label="Full Name"
-              variant="outlined"
               margin="normal"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
+
             <TextField
               fullWidth
               label="Email"
               type="email"
-              variant="outlined"
               margin="normal"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+
             <TextField
               fullWidth
               label="Password"
               type="password"
-              variant="outlined"
               margin="normal"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            {/* 🔥 NEW FIELD */}
+            <TextField
+              fullWidth
+              label="Confirm Password"
+              type="password"
+              margin="normal"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
 
@@ -92,13 +126,14 @@ const Register = () => {
               type="submit"
               fullWidth
               variant="contained"
+              disabled={loading}
               sx={{
                 mt: 2,
                 borderRadius: 2,
                 background: "linear-gradient(45deg, #e91e63, #f06292)",
               }}
             >
-              Register
+              {loading ? "Registering..." : "Register"}
             </Button>
           </form>
 

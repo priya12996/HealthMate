@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Hospitals from "./components/Hospitals/Hospitals";
 
+
 import Header from "./components/Header/Header/Header";
 import Footer from "./components/Header/Footer/Footer";
 import Home from "./components/Home/Home";

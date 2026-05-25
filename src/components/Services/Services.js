@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -14,20 +15,24 @@ import {
 import HomeIcon from "@mui/icons-material/Home";
 import ReadMoreIcon from "@mui/icons-material/ReadMore";
 import { HashLink } from "react-router-hash-link";
-import { useNavigate } from "react-router-dom";
+import PeriodTracker from "../PeriodTracker/PeriodTracker.js";
 
 import useData from "../../Hooks/useData";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 
 const Services = () => {
   const services = useData();
-  const navigate = useNavigate(); // ✅ correct place
 
-  const serviceDetails = (servId) => {
-    navigate(`/services/details/${servId}`); // ✅ v6 style
+  // 🔥 NEW STATE (for opening description)
+  const [openIndex, setOpenIndex] = useState(null);
+
+  // 🔥 TOGGLE FUNCTION
+  const handleToggle = (id) => {
+    setOpenIndex(openIndex === id ? null : id);
   };
 
   return (
+    
     <Box
       id="services"
       sx={{
@@ -47,6 +52,13 @@ const Services = () => {
           <Typography sx={{ mt: 2, mb: 2, fontWeight: 600 }} variant="h6">
             Our Services
           </Typography>
+          <Box mt={5}>
+  <Typography variant="h4" textAlign="center" mb={3}>
+    Women's Health 🌸
+  </Typography>
+
+  <PeriodTracker />
+</Box>
 
           <Grid container spacing={3} justifyContent="center">
             {services[0].map((service) => (
@@ -82,16 +94,33 @@ const Services = () => {
                       <Typography gutterBottom variant="h5">
                         Consult for {service.treatment}
                       </Typography>
+
+                      {/* 🔥 DESCRIPTION SHOW */}
+                      {openIndex === service.id && (
+                        <Typography
+                          variant="body2"
+                          sx={{ mt: 2, color: "text.secondary" }}
+                        >
+                          {service.description ||
+                            `This department specializes in ${service.treatment} related treatments. 
+                            It provides expert consultation, diagnosis, and advanced medical care. 
+                            Our experienced doctors ensure proper guidance, medication, and support 
+                            for patients to maintain a healthy life. Regular checkups and early 
+                            detection help prevent serious issues.`}
+                        </Typography>
+                      )}
                     </CardContent>
                   </CardActionArea>
 
                   <CardActions sx={{ justifyContent: "center" }}>
                     <Button
-                      onClick={() => serviceDetails(service.id)}
+                      onClick={() => handleToggle(service.id)}
                       variant="contained"
                       startIcon={<ReadMoreIcon />}
                     >
-                      See More Details
+                      {openIndex === service.id
+                        ? "Hide Details"
+                        : "See More Details"}
                     </Button>
                   </CardActions>
                 </Card>
