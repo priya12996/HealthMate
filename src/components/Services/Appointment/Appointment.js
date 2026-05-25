@@ -1209,8 +1209,6 @@ import {
 import Autocomplete from "@mui/material/Autocomplete";
 import React, { useState } from "react";
 import swal from "sweetalert";
-import { db } from "../../Login/Firebase/Firebase.config";
-import { collection, addDoc } from "firebase/firestore";
 import {
   LocalizationProvider,
   MobileDateTimePicker,
@@ -1317,7 +1315,7 @@ const Appointment = () => {
     }
   };
 
-  // ✅ Booking (Saves to Cloud Firestore)
+  // ✅ Booking (Saves to MongoDB via Express Backend)
   const handleBooking = async () => {
     if (!city || !hospital || !department || !name || !email) {
       swal("Please complete all steps 😤");
@@ -1325,24 +1323,36 @@ const Appointment = () => {
     }
 
     try {
-      // Save appointment to Cloud Firestore
-      await addDoc(collection(db, "appointments"), {
-        city,
-        hospital,
-        department,
-        name,
-        email,
-        problem: problem || "",
-        date: date instanceof Date ? date.toISOString() : new Date(date).toISOString(),
-        createdAt: new Date().toISOString()
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+      
+      const response = await fetch(`${BACKEND_URL}/api/appointments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          city,
+          hospital,
+          department,
+          name,
+          email,
+          problem: problem || "",
+          date: date instanceof Date ? date.toISOString() : new Date(date).toISOString()
+        })
       });
+
+      const resData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(resData.error || "Failed to save booking");
+      }
 
       swal(
         `Appointment booked at ${hospital} (${department}) 🎉`,
         { icon: "success" }
       );
     } catch (error) {
-      console.error("Firestore Save Error:", error);
+      console.error("MongoDB Save Error:", error);
       swal("Failed to save appointment to Database ❌");
     }
   };

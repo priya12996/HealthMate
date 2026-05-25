@@ -307,12 +307,61 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 const app = express();
 
 // ✅ Middleware
 app.use(cors({ origin: "*" }));
 app.use(express.json());
+
+// ================== 🍃 MONGOOSE DATABASE CONNECTION ==================
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/healthmate";
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log("🌱 Connected to MongoDB successfully!"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
+
+// Appointment Schema
+const appointmentSchema = new mongoose.Schema({
+  city: String,
+  hospital: String,
+  department: String,
+  name: String,
+  email: String,
+  problem: String,
+  date: Date,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Appointment = mongoose.model("Appointment", appointmentSchema);
+
+// ================== 🏥 APPOINTMENT API ENDPOINT ==================
+app.post("/api/appointments", async (req, res) => {
+  try {
+    const { city, hospital, department, name, email, problem, date } = req.body;
+
+    if (!city || !hospital || !department || !name || !email || !date) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const newAppointment = new Appointment({
+      city,
+      hospital,
+      department,
+      name,
+      email,
+      problem,
+      date: new Date(date)
+    });
+
+    const savedDoc = await newAppointment.save();
+    res.status(201).json({ message: "Appointment saved successfully!", data: savedDoc });
+  } catch (error) {
+    console.error("Database save error:", error);
+    res.status(500).json({ error: "Failed to save appointment to MongoDB database" });
+  }
+});
 
 // ================== 💊 MEDICINE DATASET ==================
 
